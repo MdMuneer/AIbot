@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Bot</title>
+    <link rel="stylesheet" href="index.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main>
+      <header class="header">
+        <h1>Scrimba AI Bot</h1>
+      </header>
+      <div class="chatbot-container">
+        <div class="chatbot-header">
+          <p class="sub-heading">Your smart AI assistant</p>
+        </div>
+
+        <div
+          class="chatbot-conversation-container"
+          id="chatbot-conversation-container"
+        ></div>
+
+        <form class="chatbot-input-container" id="chat-form">
+          <input
+            type="text"
+            id="user-input"
+            placeholder="Ask me anything..."
+            required
+          />
+          <button type="submit">
+            <span class="submit">submit</span>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <script>
+      document
+        .getElementById("chat-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const input = document.getElementById("user-input");
+          const question = input.value;
+          input.value = "";
+
+          const container = document.getElementById(
+            "chatbot-conversation-container"
+          );
+
+          // Show user message immediately
+          const human = document.createElement("div");
+          human.textContent = question;
+          human.classList.add("speech", "speech-human");
+          container.appendChild(human);
+          container.scrollTop = container.scrollHeight;
+
+          // Show loader for AI response
+          const loader = document.createElement("div");
+          loader.classList.add("speech", "speech-ai", "loader");
+          container.appendChild(loader);
+          container.scrollTop = container.scrollHeight;
+
+          try {
+            const response = await fetch("/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ question }),
+            }).then((res) => res.json());
+            loader.classList.remove("loader");
+            loader.textContent = response.response;
+          } catch (error) {
+            loader.classList.remove("loader");
+            loader.textContent = "Oops! Something went wrong.";
+          }
+
+          container.scrollTop = container.scrollHeight;
+        });
+    </script>
+  </body>
+</html>
